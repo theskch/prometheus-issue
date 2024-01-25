@@ -1,0 +1,65 @@
+openapi: 3.0.3
+info:
+  title: test-server
+  version: '1.0.0'
+  description: Test server used to demonstrate issue with prometheus lib
+  contact:
+    email: sakac1990@gmail.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: http://localhost:8080/{apiVersion}
+    description: Local server for testig purposes.
+    variables:
+      apiVersion:
+        enum:
+          - v1
+paths:
+  /ping:
+    head:
+      summary: Ping healthcheck
+      operationId: ping
+      responses:
+        "200":
+          description: OK
+  /info/{id}:
+    get:
+      summary: Simple call to increase metrics count with ID as metric label
+      operationId: info
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+        "400":
+          $ref: '#/components/responses/invalidArgumentError'
+        "500":
+          $ref: '#/components/responses/internalServerError'
+components:
+  schemas:
+    error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error description
+  responses:
+    invalidArgumentError:
+      description: Bad request, see the response body for the detail
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    internalServerError:
+      description: Internal server error, see the response body for the detail
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
